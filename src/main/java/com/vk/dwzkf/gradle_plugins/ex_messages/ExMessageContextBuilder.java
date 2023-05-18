@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -54,10 +55,42 @@ public class ExMessageContextBuilder {
         return new ExMessageContext(defaultLocale, definedLocalizations, locale2messages);
     }
 
+    private final Pattern placeHolderPattern = Pattern.compile("\\{[^}]+\\}");
+
     private void validateParametersMatches(Map<String, Map<String, String>> message2localizations) {
         for (Map.Entry<String, Map<String, String>> entry : message2localizations.entrySet()) {
             String messageKey = entry.getKey();
+            Map<String, Set<String>> locale2placeholders = new LinkedHashMap<>();
+            Set<String> definedParameters = new LinkedHashSet<>();
+            for (Map.Entry<String, String> locale2message : entry.getValue().entrySet()) {
+                Set<String> parameters = locale2placeholders.computeIfAbsent(
+                        locale2message.getKey(),
+                        k -> new LinkedHashSet<>()
+                );
+                parameters.addAll(extractParameters(locale2message));
+                definedParameters.addAll(parameters);
+            }
+            for (Map.Entry<String, String> locale2message : entry.getValue().entrySet()) {
+                Set<String> localeParameters = extractParameters(locale2message);
+                if (!localeParameters.containsAll(definedParameters)) {
+                    throw new IllegalStateException(
+                            String.format(
+                                    "Message:%s defined parameters:%s but locale:%s only found parameters:%s",
+                                    messageKey,
+                                    definedParameters,
+                                    locale2message.getKey(),
+                                    localeParameters
+                            )
+                    );
+                }
+            }
         }
+    }
+
+    private Set<String> extractParameters(Map.Entry<String, String> locale2message) {
+        return placeHolderPattern.matcher(locale2message.getValue()).results()
+                .map(r -> locale2message.getValue().substring(r.start()+1, r.end()-1))
+                .collect(Collectors.toSet());
     }
 
     private void validateAllLocalizationsExists(
