@@ -26,5 +26,6 @@ public abstract class ExMessagesCfg {
         getResourcesPath().convention("src/main/resources");
         getBaseFileName().convention("exception_messages");
         getEnabled().convention(false);
+        getOutputDirectory().convention("");
     }
 }
