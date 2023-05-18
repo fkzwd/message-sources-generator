@@ -1,4 +1,4 @@
-package com.vk.dwzkf.gradle_plugins.ex_messages;
+package com.vk.dwzkf.gradle_plugins.message_sources_generator;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor
 @Getter
-public class ExMessageContextBuilder {
+public class MessagesContextBuilder {
     private final Project project;
     private final String defaultLocale;
     private final boolean validateAllLocalizationsExists;
     private final boolean validateParametersMatches;
 
-    public ExMessageContext build(
+    public MessagesContext build(
             Map<String, Map<String, String>> message2localizations
     ) {
         Map<String, Map<String, String>> locale2messages = new LinkedHashMap<>();
@@ -52,7 +52,7 @@ public class ExMessageContextBuilder {
                 .map(e -> e.getKey() + ":" + e.getValue().size())
                 .collect(Collectors.joining(",", "[", "]"));
         project.getLogger().info("Prepare of messages end. Messages found:" + messagesFound);
-        return new ExMessageContext(defaultLocale, definedLocalizations, locale2messages);
+        return new MessagesContext(defaultLocale, definedLocalizations, locale2messages);
     }
 
     private final Pattern placeHolderPattern = Pattern.compile("\\{[^}]+\\}");

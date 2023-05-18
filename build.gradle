@@ -24,8 +24,8 @@ dependencies {
 gradlePlugin {
     plugins {
         fileDiff {
-            id = 'com.vk.dwzkf.gradle-plugins.ex-messages'
-            implementationClass = 'com.vk.dwzkf.gradle_plugins.ex_messages.ExMessagesPlugin'
+            id = 'com.vk.dwzkf.gradle-plugins.message-sources-generator'
+            implementationClass = 'com.vk.dwzkf.gradle_plugins.message_sources_generator.MessageSourcesGeneratorPlugin'
         }
     }
 }

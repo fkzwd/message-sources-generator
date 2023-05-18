@@ -1,4 +1,4 @@
-package com.vk.dwzkf.gradle_plugins.ex_messages;
+package com.vk.dwzkf.gradle_plugins.message_sources_generator;
 
 import lombok.*;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ExceptionMessageFile {
+public class MessagesFile {
     private String fileName;
     private Map<String, String> messages;
 }

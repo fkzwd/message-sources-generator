@@ -1,4 +1,4 @@
-package com.vk.dwzkf.gradle_plugins.ex_messages;
+package com.vk.dwzkf.gradle_plugins.message_sources_generator;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -20,44 +20,52 @@ import java.util.stream.Collectors;
  * @author Roman Shageev
  * @since 18.05.2023
  */
-public class ExceptionPropertiesCreator {
+public class MessageSourcesCreator {
     private final Task task;
     private final Project project;
-    private final ExMessagesCfg cfg;
+    private final MessageSource cfg;
     private final String projectPath;
-    private final ExMessageContextBuilder contextBuilder;
+    private final BaseConfig extCfg;
+    private final MessagesContextBuilder contextBuilder;
 
-    public ExceptionPropertiesCreator(Task task, Project project, ExMessagesCfg cfg) {
+    public MessageSourcesCreator(
+            Task task,
+            Project project,
+            MessageSource messageSource,
+            BaseConfig extCfg
+    ) {
         this.task = Objects.requireNonNull(task, "Task cannot be null");
         this.project = Objects.requireNonNull(project, "Project cannot be null");
-        this.cfg = Objects.requireNonNull(cfg, "Cfg cannot be null");
+        this.cfg = Objects.requireNonNull(messageSource, "Cfg cannot be null");
         this.projectPath = project.getProjectDir().getAbsolutePath();
-        this.contextBuilder = new ExMessageContextBuilder(
+        this.contextBuilder = new MessagesContextBuilder(
                 project,
                 cfg.getDefaultLocale().get(),
                 cfg.getValidateLocalizations().get(),
                 cfg.getValidateParameters().get()
         );
+        this.extCfg = extCfg;
     }
 
     public void createProperties() {
         File srcFile = getFile();
         Map<String, Map<String, String>> message2localizations = readYaml(srcFile);
-        ExMessageContext ctx = contextBuilder.build(message2localizations);
-        List<ExceptionMessageFile> outputFiles = buildFiles(ctx);
+        MessagesContext ctx = contextBuilder.build(message2localizations);
+        List<MessagesFile> outputFiles = buildFiles(ctx);
         project.getLogger()
                 .info("Output files:" +
                         outputFiles.stream()
-                                .map(ExceptionMessageFile::getFileName)
+                                .map(MessagesFile::getFileName)
                                 .collect(Collectors.joining(","))
                 );
         outputFiles.forEach(this::createOutputFile);
     }
 
-    private void createOutputFile(ExceptionMessageFile outputFile) {
+    private void createOutputFile(MessagesFile outputFile) {
         Path outputFilePath = Paths.get(
                 projectPath,
-                cfg.getResourcesPath().get(),
+                extCfg.getResourcesPath().get(),
+                extCfg.getOutputDirectory().get(),
                 cfg.getOutputDirectory().get(),
                 outputFile.getFileName()
         );
@@ -90,15 +98,18 @@ public class ExceptionPropertiesCreator {
         }
     }
 
-    private List<ExceptionMessageFile> buildFiles(ExMessageContext ctx) {
-        List<ExceptionMessageFile> files = new ArrayList<>();
+    private List<MessagesFile> buildFiles(MessagesContext ctx) {
+        List<MessagesFile> files = new ArrayList<>();
         String baseFileName = cfg.getBaseFileName().get();
         Map<String, Map<String, String>> locale2message = ctx.getLocale2message();
+        MessagesFile defaultLocaleFile = new MessagesFile();
+        defaultLocaleFile.setFileName(baseFileName+".properties");
+        defaultLocaleFile.setMessages(locale2message.get(cfg.getDefaultLocale().get()));
+        files.add(defaultLocaleFile);
         for (Map.Entry<String, Map<String, String>> entry : locale2message.entrySet()) {
             String locale = entry.getKey();
-            ExceptionMessageFile file = new ExceptionMessageFile();
-            String fileSuffix = locale.equals(ctx.getDefaultLocale()) ? "" : "_" + locale;
-            String fileName = baseFileName + fileSuffix + ".properties";
+            MessagesFile file = new MessagesFile();
+            String fileName = baseFileName + "_" + locale + ".properties";
             file.setFileName(fileName);
             file.setMessages(entry.getValue());
             files.add(file);
@@ -126,7 +137,7 @@ public class ExceptionPropertiesCreator {
     private File getFile() {
         Path srcFilePath = Paths.get(
                 projectPath,
-                cfg.getResourcesPath().get(),
+                extCfg.getResourcesPath().get(),
                 cfg.getSourceYmlFile().get()
         );
         boolean fileExists = Files.isRegularFile(srcFilePath);

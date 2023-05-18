@@ -1,4 +1,4 @@
-package com.vk.dwzkf.gradle_plugins.ex_messages;
+package com.vk.dwzkf.gradle_plugins.message_sources_generator;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ExMessageContext {
+public class MessagesContext {
     private String defaultLocale;
     private Set<String> definedLocales;
     private Map<String, Map<String, String>> locale2message;
