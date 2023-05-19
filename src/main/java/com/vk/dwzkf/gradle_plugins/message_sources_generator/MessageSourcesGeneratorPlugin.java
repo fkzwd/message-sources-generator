@@ -25,15 +25,15 @@ public class MessageSourcesGeneratorPlugin implements Plugin<Project> {
                         return;
                     }
                     task.doFirst(t -> {
-                        int idx = 0;
                         for (MessageSource messageSource : ext.getMessageSources()) {
                             if (messageSource.getEnabled().get()) {
                                 new MessageSourcesCreator(task, project, messageSource, ext)
                                         .createProperties();
                             } else {
-                                project.getLogger().info("Message source "+messageSource.getName()+" is disabled. Skipped.");
+                                project.getLogger().info(
+                                        "Message source "+messageSource.getName()+" is disabled. Skipped."
+                                );
                             }
-                            idx++;
                         }
                     });
                 });

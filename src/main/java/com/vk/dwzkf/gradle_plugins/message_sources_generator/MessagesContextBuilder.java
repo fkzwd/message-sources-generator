@@ -23,6 +23,7 @@ public class MessagesContextBuilder {
     private final boolean validateAllLocalizationsExists;
     private final boolean validateParametersMatches;
 
+    //TODO: add check when default locale not provided
     public MessagesContext build(
             Map<String, Map<String, String>> message2localizations
     ) {
