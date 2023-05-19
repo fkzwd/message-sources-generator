@@ -2,7 +2,9 @@ plugins {
     id 'java'
     id 'java-gradle-plugin'
     id 'maven-publish'
+    id 'com.jfrog.artifactory' version "4.26.2"
 }
+apply from: "$rootDir/private_publish.gradle"
 
 group 'com.vk.dwzkf.gradle-plugins'
 version '1.0'
