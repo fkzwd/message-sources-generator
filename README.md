@@ -48,3 +48,31 @@ messageSourcesCfg {
     }
 }
 ```
+
+имеем исходный src/main/resources/message-bundles/message_bundle.yml
+```yaml
+test_message1:
+  ru: "Сообщение {0}"
+  en: "Message {0}"
+msg2:
+  ru: "Сообщение2"
+  en: "Message2"
+```
+
+генерятся файлы ***src/main/resources/i18n/***:
+
+- **message_bundle.properties:**
+```properties
+test_message1="Сообщение {0}"
+msg2         ="Сообщение2"
+```
+- **message_bundle_ru.properties:**
+```properties
+test_message1="Сообщение {0}"
+msg2         ="Сообщение2"
+```
+- **message_bundle_en.properties:**
+```properties
+test_message1="Message {0}"
+msg2         ="Message2"
+```
