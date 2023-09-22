@@ -5,7 +5,11 @@
 - Проводит проверку на соответствие параметров для каждой локализации в каждом сообщении
 - Проводит проверку на наличие сообщений для каждой из определенных в рамках *.yml* файла локализаций 
 
-опубликуйте в своем артифактори
+## Для использования плагина
+### склонируйте репозиторий к себе
+### опубликуйте в своем артифактори:<br/>
+- для этого в корне проекта создайте файл `private_publish.gradle`
+- в него внесите такой блок
 ```groovy
 artifactory {
     contextUrl = '${artifactory-url}'
@@ -22,17 +26,28 @@ artifactory {
     }
 }
 ```
+- запустите таску `gradlew artifactoryPublish`
 
-
-
-Добавьте в build.gradle
+## Использование плагина
+- Добавьте в settings.gradle
+```groovy
+pluginManagement {
+    repositories {
+        maven {
+            url '${your-repo-url}'
+            // allowInsecureProtocol = true // if needed
+        }
+    }
+}
+```
+- Добавьте в build.gradle
 ```groovy
 plugins {
 //...
     id 'com.vk.dwzkf.gradle-plugins.message-sources-generator' version '1.0'
 }
 ```
- и в самом низу build.gradle
+- добавьте в самом низу build.gradle
 ```groovy
 messageSourcesCfg {
     outputDirectory = 'i18n' //default is "" //директория куда сгенерятся проперти файлы
@@ -55,7 +70,7 @@ messageSourcesCfg {
     }
 }
 ```
-
+## Usage
 имеем исходный src/main/resources/message-bundles/message_bundle.yml
 ```yaml
 test_message1:
@@ -65,6 +80,8 @@ msg2:
   ru: "Сообщение2"
   en: "Message2"
 ```
+плагин настроен так что перед таской `compileJava` происходит генерация файлов.<br/>
+Либо можно запустить вручную `gradlew generateMessageBundles`.<br/>
 
 генерятся файлы ***src/main/resources/i18n/***:
 
